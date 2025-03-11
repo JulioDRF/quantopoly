@@ -131,3 +131,21 @@ dist
 
 # Wails
 build/bin
+
+# Svelte:
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/frontend/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

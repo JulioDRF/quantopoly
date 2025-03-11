@@ -4,6 +4,11 @@
 
 A simulator of The Landlord's Game.
 
+
+## Tip
+
+If running on Linux, use `wails dev -tags webkit2_41` or `wails build -tags webkit2_41`
+
 ------------------------------------
 
 This is the official Wails Vanilla template.
