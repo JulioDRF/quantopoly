@@ -42,6 +42,13 @@ interface UtilityRents {
     twoOwned: number;
 }
 
+interface Roll {
+    first: number;
+    second: number;
+    total: number;
+    isDouble: boolean;
+}
+
 const railroadRents: RailRoadRents = {
     base: 25,
     twoOwned: 50,
@@ -694,7 +701,7 @@ export const CellPositions = Object.freeze({
     Boardwalk: 39,
 })
 
-export const movePlayer = (player: Player, cellPosition: number)=> {
+export function movePlayer(player: Player, cellPosition: number) {
     if (player.position === CellPositions.Jail && player.jailTurns > 0) {
         // Player is in jail
         return;
@@ -705,7 +712,7 @@ export const movePlayer = (player: Player, cellPosition: number)=> {
     player.position = cellPosition;
 }
 
-const handleAdvanceToRailroad = (player: Player) => {
+export function handleAdvanceToRailroad(player: Player) {
     if (player.position < CellPositions.ReadingRailroad) {
         movePlayer(player, CellPositions.ReadingRailroad);
         return;
@@ -718,7 +725,32 @@ const handleAdvanceToRailroad = (player: Player) => {
     } else {
         movePlayer(player, CellPositions.ShortLine);
     }
-};
+}
+
+export function rollDice(): Roll {
+    const first = Math.ceil(Math.random() * 6);
+    const second = Math.ceil(Math.random() * 6);
+    return {
+        first,
+        second,
+        total: first + second,
+        isDouble: first === second
+    };
+}
+
+export function buyProperty(player: Player, cellPosition: number, price: number) {
+    if (player.cash < price) {
+        console.error("Get your paper up");
+        return;
+    }
+
+    const cell = cells[cellPosition];
+    if (!cell.forSale) {
+        console.error("Not for sale");
+    }
+    player.cash -= price;
+    cell.owner = player.id;
+}
 
 export const chanceCards = [
     {
@@ -832,5 +864,119 @@ export const chanceCards = [
         handler: (player: Player) => {
             player.cash += 150;
         }
+    },
+];
+
+export const communityChestCards = [
+    {
+        name: "Advance to Go (Collect $200)",
+        handler: (player: Player) => {
+            movePlayer(player, CellPositions.Go);
+        },
+},
+    {
+        name: "Bank error in your favor. Collect $200",
+        handler: (player: Player) => {
+            player.cash += 200;
+        },
+    },
+    {
+        name: "Doctor’s fee. Pay $50",
+        handler: (player: Player) => {
+            player.cash -= 50;
+        },
+    },
+    {
+        name: "From sale of stock you get $50",
+        handler: (player: Player) => {
+            player.cash += 50;
+        },
+    },
+    {
+        name: "Get Out of Jail Free",
+        handler: (player: Player) => {
+            player.jailTurns -= 3;
+        },
+    },
+    {
+        name: "Go to Jail. Go directly to jail, do not pass Go, do not collect $200",
+        handler: (player: Player) => {
+            player.position = CellPositions.Jail;
+            player.jailTurns += 3;
+        },
+    },
+    {
+        name: "Holiday fund matures. Receive $100",
+        handler: (player: Player) => {
+            player.cash += 100;
+        },
+    },
+    {
+        name: "Income tax refund. Collect $20",
+        handler: (player: Player) => {
+            player.cash += 20;
+        },
+    },
+    {
+        name: "It is your birthday. Collect $10 from every player",
+        handler: (player: Player, players: Player[]) => {
+            for (const op of players) {
+                op.cash -= 10;
+                player.cash += 10;
+            }
+        },
+    },
+    {
+        name: "Life insurance matures. Collect $100",
+        handler: (player: Player) => {
+            player.cash += 100;
+        },
+    },
+    {
+        name: "Pay hospital fees of $100",
+        handler: (player: Player) => {
+            player.cash -= 100;
+
+        },
+    },
+    {
+        name: "Pay school fees of $50",
+        handler: (player: Player) => {
+            player.cash -= 50;
+        },
+    },
+    {
+        name: "Receive $25 consultancy fee",
+        handler: (player: Player) => {
+            player.cash += 25;
+        },
+    },
+    {
+        name: "You are assessed for street repair. $40 per house. $115 per hotel",
+        handler: (player: Player) => {
+            const playerProperties = cells.filter((c) => c.owner === player.id);
+            const toPay = playerProperties.reduce((total, cell) => {
+                if (cell.hotelCount && cell.hotelCount > 0) {
+                    return total + 115;
+                }
+                if (cell.houseCount && cell.houseCount > 0) {
+                    return total + 40 * cell.houseCount;
+                }
+                return total;
+            }, 0);
+            player.cash -= toPay;
+        },
+    },
+    {
+        name: "You have won second prize in a beauty contest. Collect $10",
+        handler: (player: Player) => {
+            player.cash += 10;
+        },
+    },
+    {
+        name: "You inherit $100",
+        handler: (player: Player) => {
+            player.cash += 100;
+        },
     },
 ];
