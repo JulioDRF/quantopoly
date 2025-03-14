@@ -1,3 +1,11 @@
+interface Player {
+    id: number;
+    piece: string;
+    position: number;
+    cash: number;
+    jailTurns: number;
+}
+
 const railroadRents = {
     base: 25,
     twoOwned: 50,
@@ -753,30 +761,34 @@ export const chanceCards = [
                 }
                 return total;
             }, 0);
+            player.cash -= toPay;
         }
     },
     {
         name: "Speeding fine $15",
         handler: (player: Player) => {
-
+            player.cash -= 15;
         }
     },
     {
         name: "Take a trip to Reading Railroad. If you pass Go, collect $200",
         handler: (player: Player) => {
-
+            movePlayer(player, CellPositions.ReadingRailroad);
         }
     },
     {
         name: "You have been elected Chairman of the Board. Pay each player $50",
-        handler: (player: Player) => {
-
+        handler: (player: Player, players: Player[]) => {
+            for (const op of players) {
+                player.cash -= 50;
+                op.cash += 50;
+            }
         }
     },
     {
         name: "Your building loan matures. Collect $150",
         handler: (player: Player) => {
-
+            player.cash += 150;
         }
     },
 
