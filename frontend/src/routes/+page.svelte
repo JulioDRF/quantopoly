@@ -14,9 +14,20 @@ import { cells } from "../constants.js";
     {#each game.board.cells as cell, index}
         <div class="cell ga-c{index}">
             {#if cell.color }
-                <div class="bg-{cell.color}-800" style="width: 100%; height: 10%"></div>
+                <div class="cell-color {cell.color}"></div>
             {/if}
-            <span>{cell.name}</span>
+            <span class="p-0.25rem">{cell.name}</span>
+            {#if cell.type === "chance" }
+                <div class="flex justify-center items-center">
+                    <span class="text-6xl text-blue-600" style="-webkit-text-stroke-width: thin; -webkit-text-stroke-color: black">?</span>
+                </div>
+            {/if}
+            {#if cell.type === "go" }
+                <div class="flex justify-center items-center">
+                    <span class="text-6xl text-red-600" style="-webkit-text-stroke-width: thin; -webkit-text-stroke-color: black">GO!</span>
+                </div>
+                <span>Collect $200</span>
+            {/if}
         </div>
     {/each}
 </div>
@@ -40,14 +51,20 @@ import { cells } from "../constants.js";
         'c10 c9 c8 c7 c6 c5 c4 c3 c2 c1 c0';
         grid-template-columns: 11vw repeat(9, 8.5vw) 11vw;
         grid-template-rows: 11vh repeat(9, 8.5vh) 11vh;
+        border: 2px solid black;
     }
     .cell {
         margin: 0;
-        padding: 0.25rem;
+        padding: 0;
         text-align: center;
         border: 1px solid black;
-        border-collapse: separate;
+        border-collapse: collapse;
         font-weight: bold;
+    }
+    .cell-color {
+        border-bottom: 2px solid black;
+        border-collapse: collapse;
+        height: clamp(10px, 1.5rem, 100px);
     }
     .ga-center {
         grid-area: C;

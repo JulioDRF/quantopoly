@@ -58,7 +58,7 @@ export const cells: Cell[] =[
     {
         name: "Mediterranean Avenue",
         type: "property",
-        color: "purple",
+        color: "bg-purple-700",
         group: "purple",
         owner: null,
         forSale: true,
@@ -83,7 +83,7 @@ export const cells: Cell[] =[
     {
         name: "Baltic Avenue",
         type: "property",
-        color: "purple",
+        color: "bg-purple-700",
         group: "purple",
         owner: null,
         forSale: true,
@@ -110,6 +110,7 @@ export const cells: Cell[] =[
         name: "Reading Railroad",
         type: "property",
         group: "railroads",
+        color: "bg-black",
         owner: null,
         forSale: true,
         houseCount: 0,
@@ -122,7 +123,7 @@ export const cells: Cell[] =[
     {
         name: "Oriental Avenue",
         type: "property",
-        color: "light-blue",
+        color: "bg-blue-300",
         group: "light-blue",
         owner: null,
         forSale: true,
@@ -147,7 +148,7 @@ export const cells: Cell[] =[
     {
         name: "Vermont Avenue",
         type: "property",
-        color: "light-blue",
+        color: "bg-blue-300",
         group: "light-blue",
         owner: null,
         forSale: true,
@@ -168,6 +169,7 @@ export const cells: Cell[] =[
     {
         name: "Connecticut Avenue",
         type: "property",
+        color: "bg-blue-300",
         group: "light-blue",
         owner: null,
         forSale: true,
@@ -192,7 +194,7 @@ export const cells: Cell[] =[
     {
         name: "St. Charles Place",
         type: "property",
-        color: "magenta",
+        color: "bg-pink-500",
         group: "magenta",
         owner: null,
         forSale: true,
@@ -213,6 +215,7 @@ export const cells: Cell[] =[
     {
         name: "Electric Company",
         type: "property",
+        color: "bg-white",
         group: "utilities",
         owner: null,
         forSale: true,
@@ -227,7 +230,7 @@ export const cells: Cell[] =[
     {
         name: "States Avenue",
         type: "property",
-        color: "magenta",
+        color: "bg-pink-500",
         group: "magenta",
         owner: null,
         forSale: true,
@@ -248,7 +251,7 @@ export const cells: Cell[] =[
     {
         name: "Virginia Avenue",
         type: "property",
-        color: "magenta",
+        color: "bg-pink-500",
         group: "magenta",
         owner: null,
         forSale: true,
@@ -269,6 +272,7 @@ export const cells: Cell[] =[
     {
         name: "Pennsylvania Railroad",
         type: "property",
+        color: "bg-black",
         group: "railroads",
         owner: null,
         forSale: true,
@@ -282,7 +286,7 @@ export const cells: Cell[] =[
     {
         name: "St. James Place",
         type: "property",
-        color: "orange",
+        color: "bg-orange-500",
         group: "orange",
         owner: null,
         forSale: true,
@@ -307,7 +311,7 @@ export const cells: Cell[] =[
     {
         name: "Tennessee Avenue",
         type: "property",
-        color: "orange",
+        color: "bg-orange-500",
         group: "orange",
         owner: null,
         forSale: true,
@@ -328,7 +332,7 @@ export const cells: Cell[] =[
     {
         name: "New York Avenue",
         type: "property",
-        color: "orange",
+        color: "bg-orange-500",
         group: "orange",
         owner: null,
         forSale: true,
@@ -353,7 +357,7 @@ export const cells: Cell[] =[
     {
         name: "Kentucky Avenue",
         type: "property",
-        color: "red",
+        color: "bg-red-600",
         group: "red",
         owner: null,
         forSale: true,
@@ -378,7 +382,7 @@ export const cells: Cell[] =[
     {
         name: "Indiana Avenue",
         type: "property",
-        color: "red",
+        color: "bg-red-600",
         group: "red",
         owner: null,
         forSale: true,
@@ -399,7 +403,7 @@ export const cells: Cell[] =[
     {
         name: "Illinois Avenue",
         type: "property",
-        color: "red",
+        color: "bg-red-600",
         group: "red",
         owner: null,
         forSale: true,
@@ -420,6 +424,7 @@ export const cells: Cell[] =[
     {
         name: "B. & O. Railroad",
         type: "property",
+        color: "bg-black",
         group: "railroads",
         owner: null,
         forSale: true,
@@ -433,7 +438,7 @@ export const cells: Cell[] =[
     {
         name: "Atlantic Avenue",
         type: "property",
-        color: "yellow",
+        color: "bg-yellow-400",
         group: "yellow",
         owner: null,
         forSale: true,
@@ -454,7 +459,7 @@ export const cells: Cell[] =[
     {
         name: "Ventnor Avenue",
         type: "property",
-        color: "yellow",
+        color: "bg-yellow-400",
         group: "yellow",
         owner: null,
         forSale: true,
@@ -475,6 +480,7 @@ export const cells: Cell[] =[
     {
         name: "Water Works",
         type: "property",
+        color: "bg-white",
         group: "utilities",
         owner: null,
         forSale: true,
@@ -489,7 +495,7 @@ export const cells: Cell[] =[
     {
         name: "Marvin Gardens",
         type: "property",
-        color: "yellow",
+        color: "bg-yellow-400",
         group: "yellow",
         owner: null,
         forSale: true,
@@ -514,7 +520,7 @@ export const cells: Cell[] =[
     {
         name: "Pacific Avenue",
         type: "property",
-        color: "green",
+        color: "bg-green-600",
         group: "green",
         owner: null,
         forSale: true,
@@ -535,7 +541,7 @@ export const cells: Cell[] =[
     {
         name: "North Carolina Avenue",
         type: "property",
-        color: "green",
+        color: "bg-green-600",
         group: "green",
         owner: null,
         forSale: true,
@@ -560,7 +566,7 @@ export const cells: Cell[] =[
     {
         name: "Pennsylvania Avenue",
         type: "property",
-        color: "green",
+        color: "bg-green-600",
         group: "green",
         owner: null,
         forSale: true,
@@ -581,6 +587,7 @@ export const cells: Cell[] =[
     {
         name: "Short Line",
         type: "property",
+        color: "bg-black",
         group: "railroads",
         owner: null,
         forSale: true,
@@ -598,7 +605,7 @@ export const cells: Cell[] =[
     {
         name: "Park Place",
         type: "property",
-        color: "blue",
+        color: "bg-blue-800",
         group: "blue",
         owner: null,
         forSale: true,
@@ -624,7 +631,7 @@ export const cells: Cell[] =[
     {
         name: "Boardwalk",
         type: "property",
-        color: "blue",
+        color: "bg-blue-800",
         group: "blue",
         owner: null,
         forSale: true,
