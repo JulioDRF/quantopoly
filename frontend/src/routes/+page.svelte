@@ -12,7 +12,12 @@ import { cells } from "../constants.js";
 <div class="board">
     <div class="cell ga-center">GUH</div>
     {#each game.board.cells as cell, index}
-        <div class="cell ga-c{index}">{cell.name}</div>
+        <div class="cell ga-c{index}">
+            {#if cell.color }
+                <div class="bg-{cell.color}-800" style="width: 100%; height: 10%"></div>
+            {/if}
+            <span>{cell.name}</span>
+        </div>
     {/each}
 </div>
 
@@ -38,9 +43,11 @@ import { cells } from "../constants.js";
     }
     .cell {
         margin: 0;
-        padding: 0;
+        padding: 0.25rem;
         text-align: center;
         border: 1px solid black;
+        border-collapse: separate;
+        font-weight: bold;
     }
     .ga-center {
         grid-area: C;
