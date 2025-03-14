@@ -6,14 +6,50 @@ interface Player {
     jailTurns: number;
 }
 
-const railroadRents = {
+interface Cell {
+    name: string;
+    type: string;
+    value?: number;
+    color?: string;
+    owner?: number|null;
+    group?: string;
+    forSale?: boolean;
+    houseCount?: number;
+    hotelCount?: number;
+    houseCost?: number;
+    rents?: HouseRents|RailRoadRents|UtilityRents;
+}
+
+interface HouseRents {
+    base: number;
+    set: number;
+    oneHouse: number;
+    twoHouses: number;
+    threeHouses: number;
+    fourHouses: number;
+    hotel: number;
+}
+
+interface RailRoadRents {
+    base: number;
+    twoOwned: number;
+    threeOwned: number;
+    fourOwned: number;
+}
+
+interface UtilityRents {
+    base: number;
+    twoOwned: number;
+}
+
+const railroadRents: RailRoadRents = {
     base: 25,
     twoOwned: 50,
     threeOwned: 100,
     fourOwned: 200,
 };
 
-export const cells =[
+export const cells: Cell[] =[
     {
         name: "Go",
         type: "go",
@@ -30,7 +66,7 @@ export const cells =[
         hotelCount: 0,
         value: 60,
         houseCost: 50,
-        rent: {
+        rents: {
             base: 2,
             set: 4,
             oneHouse: 10,
@@ -54,9 +90,8 @@ export const cells =[
         houseCount: 0,
         hotelCount: 0,
         value: 60,
-        mortgage: 30,
         houseCost: 50,
-        rent: {
+        rents: {
             base: 4,
             set: 8,
             oneHouse: 20,
@@ -80,7 +115,7 @@ export const cells =[
         houseCount: 0,
         hotelCount: 0,
         value: 200,
-        rent: {
+        rents: {
             ...railroadRents,
         },
     },
@@ -240,7 +275,7 @@ export const cells =[
         houseCount: 0,
         hotelCount: 0,
         value: 200,
-        rent: {
+        rents: {
             ...railroadRents,
         },
     },
@@ -391,7 +426,7 @@ export const cells =[
         houseCount: 0,
         hotelCount: 0,
         value: 200,
-        rent: {
+        rents: {
             ...railroadRents,
         },
     },
@@ -552,7 +587,7 @@ export const cells =[
         houseCount: 0,
         hotelCount: 0,
         value: 200,
-        rent: {
+        rents: {
             ...railroadRents,
         },
     },
@@ -791,5 +826,4 @@ export const chanceCards = [
             player.cash += 150;
         }
     },
-
-}]
+];
