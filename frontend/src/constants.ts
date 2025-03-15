@@ -1,12 +1,13 @@
 interface Player {
     id: number;
     piece: string;
-    position: number;
-    cash: number;
-    jailTurns: number;
+    position: number; // default 0
+    cash: number; // default 1500
+    jailTurns: number; // default 0
 }
 
 interface Cell {
+    id: CellPosition;
     name: string;
     type: string;
     value?: number;
@@ -14,6 +15,7 @@ interface Cell {
     owner?: number|null;
     group?: string;
     forSale?: boolean;
+    isMortgaged?: boolean;
     houseCount?: number;
     hotelCount?: number;
     houseCost?: number;
@@ -56,609 +58,9 @@ const railroadRents: RailRoadRents = {
     fourOwned: 200,
 };
 
-export const cells: Cell[] =[
-    {
-        name: "Go",
-        type: "go",
-        value: 200,
-    },
-    {
-        name: "Mediterranean Avenue",
-        type: "property",
-        color: "bg-purple-700",
-        group: "purple",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 60,
-        houseCost: 50,
-        rents: {
-            base: 2,
-            set: 4,
-            oneHouse: 10,
-            twoHouses: 30,
-            threeHouses: 90,
-            fourHouses: 160,
-            hotel: 250,
-        }
-    },
-    {
-        name: "Community Chest",
-        type: "communityChest",
-    },
-    {
-        name: "Baltic Avenue",
-        type: "property",
-        color: "bg-purple-700",
-        group: "purple",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 60,
-        houseCost: 50,
-        rents: {
-            base: 4,
-            set: 8,
-            oneHouse: 20,
-            twoHouses: 60,
-            threeHouses: 180,
-            fourHouses: 320,
-            hotel: 450,
-        }
-    },
-    {
-        name: "Income Tax",
-        type: "tax",
-        value: 200,
-    },
-    {
-        name: "Reading Railroad",
-        type: "property",
-        group: "railroads",
-        color: "bg-black",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 200,
-        rents: {
-            ...railroadRents,
-        },
-    },
-    {
-        name: "Oriental Avenue",
-        type: "property",
-        color: "bg-blue-300",
-        group: "light-blue",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 100,
-        houseCost: 50,
-        rents: {
-            base: 6,
-            set: 12,
-            oneHouse: 30,
-            twoHouses: 90,
-            threeHouses: 270,
-            fourHouses: 400,
-            hotel: 550,
-        }
-    },
-    {
-        name: "Chance",
-        type: "chance",
-    },
-    {
-        name: "Vermont Avenue",
-        type: "property",
-        color: "bg-blue-300",
-        group: "light-blue",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 100,
-        houseCost: 50,
-        rents: {
-            base: 6,
-            set: 12,
-            oneHouse: 30,
-            twoHouses: 90,
-            threeHouses: 270,
-            fourHouses: 400,
-            hotel: 550,
-        }
-    },
-    {
-        name: "Connecticut Avenue",
-        type: "property",
-        color: "bg-blue-300",
-        group: "light-blue",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 120,
-        houseCost: 50,
-        rents: {
-            base: 8,
-            set: 16,
-            oneHouse: 40,
-            twoHouses: 100,
-            threeHouses: 300,
-            fourHouses: 450,
-            hotel: 600,
-        }
-    },
-    {
-        name: "Jail",
-        type: "jail",
-    },
-    {
-        name: "St. Charles Place",
-        type: "property",
-        color: "bg-pink-500",
-        group: "magenta",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 140,
-        houseCost: 100,
-        rents: {
-            base: 10,
-            set: 20,
-            oneHouse: 50,
-            twoHouses: 150,
-            threeHouses: 450,
-            fourHouses: 625,
-            hotel: 750,
-        }
-    },
-    {
-        name: "Electric Company",
-        type: "property",
-        color: "bg-white",
-        group: "utilities",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 150,
-        rents: {
-            base: 4,
-            twoOwned: 10,
-        }
-    },
-    {
-        name: "States Avenue",
-        type: "property",
-        color: "bg-pink-500",
-        group: "magenta",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 140,
-        houseCost: 100,
-        rents: {
-            base: 10,
-            set: 20,
-            oneHouse: 50,
-            twoHouses: 150,
-            threeHouses: 450,
-            fourHouses: 625,
-            hotel: 750,
-        }
-    },
-    {
-        name: "Virginia Avenue",
-        type: "property",
-        color: "bg-pink-500",
-        group: "magenta",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 140,
-        houseCost: 100,
-        rents: {
-            base: 12,
-            set: 24,
-            oneHouse: 60,
-            twoHouses: 180,
-            threeHouses: 500,
-            fourHouses: 705,
-            hotel: 900,
-        }
-    },
-    {
-        name: "Pennsylvania Railroad",
-        type: "property",
-        color: "bg-black",
-        group: "railroads",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 200,
-        rents: {
-            ...railroadRents,
-        },
-    },
-    {
-        name: "St. James Place",
-        type: "property",
-        color: "bg-orange-500",
-        group: "orange",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 180,
-        houseCost: 100,
-        rents: {
-            base: 14,
-            set: 28,
-            oneHouse: 70,
-            twoHouses: 200,
-            threeHouses: 550,
-            fourHouses: 750,
-            hotel: 950,
-        }
-    },
-    {
-        name: "Community Chest",
-        type: "communityChest",
-    },
-    {
-        name: "Tennessee Avenue",
-        type: "property",
-        color: "bg-orange-500",
-        group: "orange",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 180,
-        houseCost: 100,
-        rents: {
-            base: 14,
-            set: 28,
-            oneHouse: 70,
-            twoHouses: 200,
-            threeHouses: 550,
-            fourHouses: 750,
-            hotel: 950,
-        }
-    },
-    {
-        name: "New York Avenue",
-        type: "property",
-        color: "bg-orange-500",
-        group: "orange",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 200,
-        houseCost: 100,
-        rents: {
-            base: 16,
-            set: 32,
-            oneHouse: 80,
-            twoHouses: 220,
-            threeHouses: 600,
-            fourHouses: 800,
-            hotel: 1000,
-        }
-    },
-    {
-        name: "Free Parking",
-        type: "freeParking",
-    },
-    {
-        name: "Kentucky Avenue",
-        type: "property",
-        color: "bg-red-600",
-        group: "red",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 220,
-        houseCost: 150,
-        rents: {
-            base: 18,
-            set: 36,
-            oneHouse: 90,
-            twoHouses: 250,
-            threeHouses: 700,
-            fourHouses: 875,
-            hotel: 1050,
-        }
-    },
-    {
-        name: "Chance",
-        type: "chance",
-    },
-    {
-        name: "Indiana Avenue",
-        type: "property",
-        color: "bg-red-600",
-        group: "red",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 220,
-        houseCost: 150,
-        rents: {
-            base: 18,
-            set: 36,
-            oneHouse: 90,
-            twoHouses: 250,
-            threeHouses: 700,
-            fourHouses: 875,
-            hotel: 1050,
-        }
-    },
-    {
-        name: "Illinois Avenue",
-        type: "property",
-        color: "bg-red-600",
-        group: "red",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 240,
-        houseCost: 150,
-        rents: {
-            base: 20,
-            set: 40,
-            oneHouse: 100,
-            twoHouses: 300,
-            threeHouses: 750,
-            fourHouses: 925,
-            hotel: 1100,
-        }
-    },
-    {
-        name: "B. & O. Railroad",
-        type: "property",
-        color: "bg-black",
-        group: "railroads",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 200,
-        rents: {
-            ...railroadRents,
-        },
-    },
-    {
-        name: "Atlantic Avenue",
-        type: "property",
-        color: "bg-yellow-400",
-        group: "yellow",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 260,
-        houseCost: 150,
-        rents: {
-            base: 22,
-            set: 44,
-            oneHouse: 110,
-            twoHouses: 330,
-            threeHouses: 800,
-            fourHouses: 975,
-            hotel: 1150,
-        }
-    },
-    {
-        name: "Ventnor Avenue",
-        type: "property",
-        color: "bg-yellow-400",
-        group: "yellow",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 260,
-        houseCost: 150,
-        rents: {
-            base: 22,
-            set: 44,
-            oneHouse: 110,
-            twoHouses: 330,
-            threeHouses: 800,
-            fourHouses: 975,
-            hotel: 1150,
-        }
-    },
-    {
-        name: "Water Works",
-        type: "property",
-        color: "bg-white",
-        group: "utilities",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 150,
-        rents: {
-            base: 4,
-            twoOwned: 10,
-        }
-    },
-    {
-        name: "Marvin Gardens",
-        type: "property",
-        color: "bg-yellow-400",
-        group: "yellow",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 280,
-        houseCost: 150,
-        rents: {
-            base: 24,
-            set: 48,
-            oneHouse: 120,
-            twoHouses: 360,
-            threeHouses: 850,
-            fourHouses: 1025,
-            hotel: 1200,
-        }
-    },
-    {
-        name: "Go to Jail",
-        type: "goToJail",
-    },
-    {
-        name: "Pacific Avenue",
-        type: "property",
-        color: "bg-green-600",
-        group: "green",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 300,
-        houseCost: 200,
-        rents: {
-            base: 26,
-            set: 52,
-            oneHouse: 130,
-            twoHouses: 390,
-            threeHouses: 900,
-            fourHouses: 1100,
-            hotel: 1275,
-        }
-    },
-    {
-        name: "North Carolina Avenue",
-        type: "property",
-        color: "bg-green-600",
-        group: "green",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 300,
-        houseCost: 200,
-        rents: {
-            base: 26,
-            set: 52,
-            oneHouse: 130,
-            twoHouses: 390,
-            threeHouses: 900,
-            fourHouses: 1100,
-            hotel: 1275,
-        }
-    },
-    {
-        name: "Community Chest",
-        type: "communityChest",
-    },
-    {
-        name: "Pennsylvania Avenue",
-        type: "property",
-        color: "bg-green-600",
-        group: "green",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 320,
-        houseCost: 200,
-        rents: {
-            base: 28,
-            set: 56,
-            oneHouse: 150,
-            twoHouses: 450,
-            threeHouses: 1000,
-            fourHouses: 1200,
-            hotel: 1400,
-        }
-    },
-    {
-        name: "Short Line",
-        type: "property",
-        color: "bg-black",
-        group: "railroads",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 200,
-        rents: {
-            ...railroadRents,
-        },
-    },
-    {
-        name: "Chance",
-        type: "chance",
-    },
-    {
-        name: "Park Place",
-        type: "property",
-        color: "bg-blue-800",
-        group: "blue",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 350,
-        houseCost: 200,
-        rents: {
-            base: 35,
-            set: 70,
-            oneHouse: 175,
-            twoHouses: 500,
-            threeHouses: 1100,
-            fourHouses: 1300,
-            hotel: 1500,
-        }
-    },
-    {
-        name: "Luxury Tax",
-        type: "tax",
-        value: 100,
-    },
-    {
-        name: "Boardwalk",
-        type: "property",
-        color: "bg-blue-800",
-        group: "blue",
-        owner: null,
-        forSale: true,
-        houseCount: 0,
-        hotelCount: 0,
-        value: 400,
-        houseCost: 200,
-        rents: {
-            base: 50,
-            set: 100,
-            oneHouse: 200,
-            twoHouses: 600,
-            threeHouses: 1400,
-            fourHouses: 1700,
-            hotel: 2000,
-        }
-    },
-];
+export type CellPosition = number;
 
-export const CellPositions = Object.freeze({
+export const CellPositions: Record<string, CellPosition> = Object.freeze({
     Go: 0,
     MediterraneanAvenue: 1,
     CommunityChest1: 2,
@@ -701,7 +103,650 @@ export const CellPositions = Object.freeze({
     Boardwalk: 39,
 })
 
-export function movePlayer(player: Player, cellPosition: number) {
+export const cells: Cell[] =[
+    {
+        id: CellPositions.Go,
+        name: "Go",
+        type: "go",
+        value: 200,
+    },
+    {
+        id: CellPositions.MediterraneanAvenue,
+        name: "Mediterranean Avenue",
+        type: "property",
+        color: "bg-purple-700",
+        group: "purple",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 60,
+        houseCost: 50,
+        rents: {
+            base: 2,
+            set: 4,
+            oneHouse: 10,
+            twoHouses: 30,
+            threeHouses: 90,
+            fourHouses: 160,
+            hotel: 250,
+        }
+    },
+    {
+        id: CellPositions.CommunityChest1,
+        name: "Community Chest",
+        type: "communityChest",
+    },
+    {
+        id: CellPositions.BalticAvenue,
+        name: "Baltic Avenue",
+        type: "property",
+        color: "bg-purple-700",
+        group: "purple",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 60,
+        houseCost: 50,
+        rents: {
+            base: 4,
+            set: 8,
+            oneHouse: 20,
+            twoHouses: 60,
+            threeHouses: 180,
+            fourHouses: 320,
+            hotel: 450,
+        }
+    },
+    {
+        id: CellPositions.IncomeTax,
+        name: "Income Tax",
+        type: "tax",
+        value: 200,
+    },
+    {
+        id: CellPositions.ReadingRailroad,
+        name: "Reading Railroad",
+        type: "property",
+        group: "railroads",
+        color: "bg-black",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 200,
+        rents: {
+            ...railroadRents,
+        },
+    },
+    {
+        id: CellPositions.OrientalAvenue,
+        name: "Oriental Avenue",
+        type: "property",
+        color: "bg-blue-300",
+        group: "light-blue",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 100,
+        houseCost: 50,
+        rents: {
+            base: 6,
+            set: 12,
+            oneHouse: 30,
+            twoHouses: 90,
+            threeHouses: 270,
+            fourHouses: 400,
+            hotel: 550,
+        }
+    },
+    {
+        id: CellPositions.Chance1,
+        name: "Chance",
+        type: "chance",
+    },
+    {
+        id: CellPositions.VermontAvenue,
+        name: "Vermont Avenue",
+        type: "property",
+        color: "bg-blue-300",
+        group: "light-blue",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 100,
+        houseCost: 50,
+        rents: {
+            base: 6,
+            set: 12,
+            oneHouse: 30,
+            twoHouses: 90,
+            threeHouses: 270,
+            fourHouses: 400,
+            hotel: 550,
+        }
+    },
+    {
+        id: CellPositions.ConnecticutAvenue,
+        name: "Connecticut Avenue",
+        type: "property",
+        color: "bg-blue-300",
+        group: "light-blue",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 120,
+        houseCost: 50,
+        rents: {
+            base: 8,
+            set: 16,
+            oneHouse: 40,
+            twoHouses: 100,
+            threeHouses: 300,
+            fourHouses: 450,
+            hotel: 600,
+        }
+    },
+    {
+        id: CellPositions.Jail,
+        name: "Jail",
+        type: "jail",
+    },
+    {
+        id: CellPositions.StCharlesPlace,
+        name: "St. Charles Place",
+        type: "property",
+        color: "bg-pink-500",
+        group: "magenta",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 140,
+        houseCost: 100,
+        rents: {
+            base: 10,
+            set: 20,
+            oneHouse: 50,
+            twoHouses: 150,
+            threeHouses: 450,
+            fourHouses: 625,
+            hotel: 750,
+        }
+    },
+    {
+        id: CellPositions.ElectricCompany,
+        name: "Electric Company",
+        type: "property",
+        color: "bg-white",
+        group: "utilities",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 150,
+        rents: {
+            base: 4,
+            twoOwned: 10,
+        }
+    },
+    {
+        id: CellPositions.StatesAvenue,
+        name: "States Avenue",
+        type: "property",
+        color: "bg-pink-500",
+        group: "magenta",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 140,
+        houseCost: 100,
+        rents: {
+            base: 10,
+            set: 20,
+            oneHouse: 50,
+            twoHouses: 150,
+            threeHouses: 450,
+            fourHouses: 625,
+            hotel: 750,
+        }
+    },
+    {
+        id: CellPositions.VirginiaAvenue,
+        name: "Virginia Avenue",
+        type: "property",
+        color: "bg-pink-500",
+        group: "magenta",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 140,
+        houseCost: 100,
+        rents: {
+            base: 12,
+            set: 24,
+            oneHouse: 60,
+            twoHouses: 180,
+            threeHouses: 500,
+            fourHouses: 705,
+            hotel: 900,
+        }
+    },
+    {
+        id: CellPositions.PennsylvaniaRailroad,
+        name: "Pennsylvania Railroad",
+        type: "property",
+        color: "bg-black",
+        group: "railroads",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 200,
+        rents: {
+            ...railroadRents,
+        },
+    },
+    {
+        id: CellPositions.StJamesPlace,
+        name: "St. James Place",
+        type: "property",
+        color: "bg-orange-500",
+        group: "orange",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 180,
+        houseCost: 100,
+        rents: {
+            base: 14,
+            set: 28,
+            oneHouse: 70,
+            twoHouses: 200,
+            threeHouses: 550,
+            fourHouses: 750,
+            hotel: 950,
+        }
+    },
+    {
+        id: CellPositions.CommunityChest2,
+        name: "Community Chest",
+        type: "communityChest",
+    },
+    {
+        id: CellPositions.TennesseeAvenue,
+        name: "Tennessee Avenue",
+        type: "property",
+        color: "bg-orange-500",
+        group: "orange",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 180,
+        houseCost: 100,
+        rents: {
+            base: 14,
+            set: 28,
+            oneHouse: 70,
+            twoHouses: 200,
+            threeHouses: 550,
+            fourHouses: 750,
+            hotel: 950,
+        }
+    },
+    {
+        id: CellPositions.NewYorkAvenue,
+        name: "New York Avenue",
+        type: "property",
+        color: "bg-orange-500",
+        group: "orange",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 200,
+        houseCost: 100,
+        rents: {
+            base: 16,
+            set: 32,
+            oneHouse: 80,
+            twoHouses: 220,
+            threeHouses: 600,
+            fourHouses: 800,
+            hotel: 1000,
+        }
+    },
+    {
+        id: CellPositions.FreeParking,
+        name: "Free Parking",
+        type: "freeParking",
+    },
+    {
+        id: CellPositions.KentuckyAvenue,
+        name: "Kentucky Avenue",
+        type: "property",
+        color: "bg-red-600",
+        group: "red",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 220,
+        houseCost: 150,
+        rents: {
+            base: 18,
+            set: 36,
+            oneHouse: 90,
+            twoHouses: 250,
+            threeHouses: 700,
+            fourHouses: 875,
+            hotel: 1050,
+        }
+    },
+    {
+        id: CellPositions.Chance,
+        name: "Chance",
+        type: "chance",
+    },
+    {
+        id: CellPositions.IndianaAvenue,
+        name: "Indiana Avenue",
+        type: "property",
+        color: "bg-red-600",
+        group: "red",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 220,
+        houseCost: 150,
+        rents: {
+            base: 18,
+            set: 36,
+            oneHouse: 90,
+            twoHouses: 250,
+            threeHouses: 700,
+            fourHouses: 875,
+            hotel: 1050,
+        }
+    },
+    {
+        id: CellPositions.IllinoisAvenue,
+        name: "Illinois Avenue",
+        type: "property",
+        color: "bg-red-600",
+        group: "red",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 240,
+        houseCost: 150,
+        rents: {
+            base: 20,
+            set: 40,
+            oneHouse: 100,
+            twoHouses: 300,
+            threeHouses: 750,
+            fourHouses: 925,
+            hotel: 1100,
+        }
+    },
+    {
+        id: CellPositions.BORailroad,
+        name: "B. & O. Railroad",
+        type: "property",
+        color: "bg-black",
+        group: "railroads",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 200,
+        rents: {
+            ...railroadRents,
+        },
+    },
+    {
+        id: CellPositions.AtlanticAvenue,
+        name: "Atlantic Avenue",
+        type: "property",
+        color: "bg-yellow-400",
+        group: "yellow",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 260,
+        houseCost: 150,
+        rents: {
+            base: 22,
+            set: 44,
+            oneHouse: 110,
+            twoHouses: 330,
+            threeHouses: 800,
+            fourHouses: 975,
+            hotel: 1150,
+        }
+    },
+    {
+        id: CellPositions.VentnorAvenue,
+        name: "Ventnor Avenue",
+        type: "property",
+        color: "bg-yellow-400",
+        group: "yellow",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 260,
+        houseCost: 150,
+        rents: {
+            base: 22,
+            set: 44,
+            oneHouse: 110,
+            twoHouses: 330,
+            threeHouses: 800,
+            fourHouses: 975,
+            hotel: 1150,
+        }
+    },
+    {
+        id: CellPositions.WaterWorks,
+        name: "Water Works",
+        type: "property",
+        color: "bg-white",
+        group: "utilities",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 150,
+        rents: {
+            base: 4,
+            twoOwned: 10,
+        }
+    },
+    {
+        id: CellPositions.MarvinGardens,
+        name: "Marvin Gardens",
+        type: "property",
+        color: "bg-yellow-400",
+        group: "yellow",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 280,
+        houseCost: 150,
+        rents: {
+            base: 24,
+            set: 48,
+            oneHouse: 120,
+            twoHouses: 360,
+            threeHouses: 850,
+            fourHouses: 1025,
+            hotel: 1200,
+        }
+    },
+    {
+        id: CellPositions.GotoJail,
+        name: "Go to Jail",
+        type: "goToJail",
+    },
+    {
+        id: CellPositions.PacificAvenue,
+        name: "Pacific Avenue",
+        type: "property",
+        color: "bg-green-600",
+        group: "green",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 300,
+        houseCost: 200,
+        rents: {
+            base: 26,
+            set: 52,
+            oneHouse: 130,
+            twoHouses: 390,
+            threeHouses: 900,
+            fourHouses: 1100,
+            hotel: 1275,
+        }
+    },
+    {
+        id: CellPositions.NorthCarolinaAvenue,
+        name: "North Carolina Avenue",
+        type: "property",
+        color: "bg-green-600",
+        group: "green",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 300,
+        houseCost: 200,
+        rents: {
+            base: 26,
+            set: 52,
+            oneHouse: 130,
+            twoHouses: 390,
+            threeHouses: 900,
+            fourHouses: 1100,
+            hotel: 1275,
+        }
+    },
+    {
+        id: CellPositions.CommunityChest3,
+        name: "Community Chest",
+        type: "communityChest",
+    },
+    {
+        id: CellPositions.PennsylvaniaAvenue,
+        name: "Pennsylvania Avenue",
+        type: "property",
+        color: "bg-green-600",
+        group: "green",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 320,
+        houseCost: 200,
+        rents: {
+            base: 28,
+            set: 56,
+            oneHouse: 150,
+            twoHouses: 450,
+            threeHouses: 1000,
+            fourHouses: 1200,
+            hotel: 1400,
+        }
+    },
+    {
+        id: CellPositions.ShortLine,
+        name: "Short Line",
+        type: "property",
+        color: "bg-black",
+        group: "railroads",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 200,
+        rents: {
+            ...railroadRents,
+        },
+    },
+    {
+        id: CellPositions.Chance3,
+        name: "Chance",
+        type: "chance",
+    },
+    {
+        id: CellPositions.ParkPlace,
+        name: "Park Place",
+        type: "property",
+        color: "bg-blue-800",
+        group: "blue",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 350,
+        houseCost: 200,
+        rents: {
+            base: 35,
+            set: 70,
+            oneHouse: 175,
+            twoHouses: 500,
+            threeHouses: 1100,
+            fourHouses: 1300,
+            hotel: 1500,
+        }
+    },
+    {
+        id: CellPositions.LuxuryTax,
+        name: "Luxury Tax",
+        type: "tax",
+        value: 100,
+    },
+    {
+        id: CellPositions.Boardwalk,
+        name: "Boardwalk",
+        type: "property",
+        color: "bg-blue-800",
+        group: "blue",
+        owner: null,
+        forSale: true,
+        houseCount: 0,
+        hotelCount: 0,
+        value: 400,
+        houseCost: 200,
+        rents: {
+            base: 50,
+            set: 100,
+            oneHouse: 200,
+            twoHouses: 600,
+            threeHouses: 1400,
+            fourHouses: 1700,
+            hotel: 2000,
+        }
+    },
+];
+
+
+export function movePlayer(player: Player, cellPosition: CellPosition) {
     if (player.position === CellPositions.Jail && player.jailTurns > 0) {
         // Player is in jail
         return;
@@ -738,18 +783,220 @@ export function rollDice(): Roll {
     };
 }
 
-export function buyProperty(player: Player, cellPosition: number, price: number) {
-    if (player.cash < price) {
-        console.error("Get your paper up");
+export function handleDoubles(player: Player, roll: Roll, count = 1) {
+    if (!roll.isDouble) {
         return;
     }
+    if (player.position === CellPositions.Jail && player.jailTurns > 0) {
+        // Get out of jail
+        player.jailTurns = 0;
+        movePlayer(player, player.position + roll.total);
+    }
+    if (count === 3) {
+        // 3 consecutive doubles: Go to jail.
+        player.position = CellPositions.Jail;
+        player.jailTurns += 3;
+    }
+}
 
+export function buyProperty(player: Player, cellPosition: CellPosition, price: number) {
     const cell = cells[cellPosition];
     if (!cell.forSale) {
         console.error("Not for sale");
     }
-    player.cash -= price;
+    playerMustPay(player, price);
     cell.owner = player.id;
+}
+
+export function playerMustPay(player: Player, amount: number) {
+    if (player.cash >= amount) {
+        player.cash -= amount;
+        return;
+    } else {
+        liquidate(player, amount);
+    }
+}
+
+export function sellProperty(player: Player, cellPosition: CellPosition, price: number) {
+    const cell = cells[cellPosition];
+    if (!cell.forSale) {
+        console.error("Not for sale");
+    }
+    player.cash += price;
+    cell.owner = null;
+}
+
+export function getPropertySellPrice(cellPosition: CellPosition): number {
+    const cell = cells[cellPosition];
+    if (!cell || !cell.forSale) {
+        console.error("Can't calculate price for a property that can't be sold:", cellPosition)
+    }
+    if (cell.isMortgaged) {
+        return cell.value! / 2;
+    }
+    return cell.value!;
+}
+
+export function getPropertyValue(cellPosition: CellPosition): number {
+    const cell = cells[cellPosition];
+    if (!cell || !cell.forSale) {
+        console.error("Can't calculate price for a property that can't be sold:", cellPosition)
+    }
+    if (cell.isMortgaged) {
+        return cell.value! / 2;
+    }
+    if (cell.group === "utilities" || cell.group === "railroads") {
+        return cell.value!;
+    } else {
+        let total = cell.value!;
+        if (cell.hotelCount! > 0) {
+            total += cell.houseCost! / 2;
+        } else if (cell.houseCount! > 0) {
+            total += cell.houseCost! / 2 * cell.houseCount!;
+        }
+        return total;
+    }
+}
+
+export function getPropertyRent(cellPosition: CellPosition): number {
+    const cell = cells[cellPosition];
+    if (!cell || !cell.forSale) {
+        console.error("Can't calculate rent for a property that can't be sold:", cellPosition);
+        return 0;
+    }
+    const ownerID = cell.owner;
+    if (ownerID === null || ownerID === undefined) {
+        console.error("Can't calculate rent for a property that isn't owner by a player:", cellPosition);
+        return 0;
+    }
+    if (cell.isMortgaged) {
+        // Default rules: mortgaged properties cannot charge rent.
+        return 0;
+    }
+    const cellGroup = cells.filter((c) => c.owner === ownerID && c.group === cell.group);
+    if (cell.group === "utilities") {
+        const rents = cell.rents as UtilityRents;
+        const rentMap = {
+            1: rents.base,
+            2: rents.twoOwned,
+        } as Record<number, number>;
+        if (cellGroup.length in rentMap) {
+            return rentMap[cellGroup.length];
+        } else {
+            console.error("This isn't supposed to happen");
+            return 0;
+        }
+    } else if (cell.group === "railroads") {
+        const rents = cell.rents as RailRoadRents;
+        const rentMap = {
+            1: rents.base,
+            2: rents.twoOwned,
+            3: rents.threeOwned,
+            4: rents.fourOwned,
+        } as Record<number, number>;
+        if (cellGroup.length in rentMap) {
+            return rentMap[cellGroup.length];
+        } else {
+            console.error("This isn't supposed to happen");
+            return 0;
+        }
+    } else {
+        const rents = cell.rents as HouseRents;
+        const ownsSet = cells.filter((c) => c.group === cell.group).length === cellGroup.length;
+        if (!ownsSet) {
+            return rents.base;
+        }
+        if (cell.hotelCount! > 0) {
+            return rents.hotel;
+        }
+        if (cell.houseCount! > 0) {
+            const rentMap = {
+                1: rents.oneHouse,
+                2: rents.twoHouses,
+                3: rents.threeHouses,
+                4: rents.fourHouses,
+            } as Record<number, number>;
+            if (cell.houseCount! in rentMap) {
+                return rentMap[cellGroup.length];
+            } else {
+                console.error("This isn't supposed to happen");
+                return 0;
+            }
+        }
+        return rents.set;
+    }
+}
+
+export function isBankrupt(player: Player) {
+    let assets = cells
+        .filter((c) => c.owner === player.id)
+        .reduce((total, c) => total + getPropertyValue(c.id), player.cash);
+    return assets < 0;
+}
+
+export function canMortgageProperty(player: Player, cellPosition: CellPosition) {
+    const cell = cells[cellPosition];
+    if (!cell) return false;
+    if (cell.owner !== player.id) return false;
+    if (cell.isMortgaged) return false;
+    const group = cells.filter((c) => c.group === cell.group);
+    const hasHouses = group.some((c) => c.houseCount! > 0 || c.hotelCount! > 0);
+    return !hasHouses;
+}
+
+export function mortgageProperty(player: Player, cellPosition: CellPosition) {
+    const cell = cells[cellPosition];
+    if (!cell.forSale || cell.isMortgaged || cell.owner !== player.id) {
+        console.error("Can't mortgage this property");
+        return;
+    }
+    cell.isMortgaged = true;
+    player.cash += cell.value! / 2;
+}
+
+export function sellHouses(player: Player, cellPosition: CellPosition) {
+    const cell = cells[cellPosition];
+    if (!cell.forSale || cell.owner !== player.id) {
+        console.error("Can't sell this property's houses");
+        return;
+    }
+    if (cell.houseCount && cell.houseCount > 0) {
+        player.cash += cell.houseCount * cell.houseCost! / 2;
+    }
+    if (cell.hotelCount && cell.hotelCount > 0) {
+        player.cash += cell.houseCost! / 2;
+    }
+}
+
+export function sellGroupHouses(player: Player, cellPosition: CellPosition) {
+    const group = cells.filter((c) => c.group === cells[cellPosition].group);
+    for (const cell of group) {
+        sellHouses(player, cell.id);
+    }
+}
+
+export function liquidate(player: Player, limit = Infinity) {
+    const properties = cells.filter((c) => c.owner === player.id).sort((a, b) => getPropertyRent(a.id) - getPropertyRent(b.id));
+    while (player.cash < limit && properties.length > 0) {
+        const cell = properties.pop();
+        if (!cell) {
+            console.error("Where's the cell?");
+            break;
+        }
+        if (cell.houseCount && cell.houseCount > 0) {
+            sellHouses(player, cell.id);
+            if (player.cash >= limit) break;
+        }
+        if (!canMortgageProperty(player, cell.id)) {
+            sellGroupHouses(player, cell.id);
+            if (player.cash >= limit) break;
+        }
+        if (canMortgageProperty(player, cell.id)) {
+            mortgageProperty(player, cell.id);
+            if (player.cash >= limit) break;
+        }
+        sellProperty(player, cell.id, getPropertySellPrice(cell.id));
+    }
 }
 
 export const chanceCards = [
@@ -835,13 +1082,13 @@ export const chanceCards = [
                 }
                 return total;
             }, 0);
-            player.cash -= toPay;
+            playerMustPay(player, toPay);
         }
     },
     {
         name: "Speeding fine $15",
         handler: (player: Player) => {
-            player.cash -= 15;
+            playerMustPay(player, 15);
         }
     },
     {
@@ -853,8 +1100,9 @@ export const chanceCards = [
     {
         name: "You have been elected Chairman of the Board. Pay each player $50",
         handler: (player: Player, players: Player[]) => {
+            playerMustPay(player, 50 * (players.length - 1));
             for (const op of players) {
-                player.cash -= 50;
+                if (op.id === player.id) continue;
                 op.cash += 50;
             }
         }
@@ -883,7 +1131,7 @@ export const communityChestCards = [
     {
         name: "Doctor’s fee. Pay $50",
         handler: (player: Player) => {
-            player.cash -= 50;
+            playerMustPay(player, 50);
         },
     },
     {
@@ -921,7 +1169,7 @@ export const communityChestCards = [
         name: "It is your birthday. Collect $10 from every player",
         handler: (player: Player, players: Player[]) => {
             for (const op of players) {
-                op.cash -= 10;
+                playerMustPay(op, 10);
                 player.cash += 10;
             }
         },
@@ -935,14 +1183,13 @@ export const communityChestCards = [
     {
         name: "Pay hospital fees of $100",
         handler: (player: Player) => {
-            player.cash -= 100;
-
+            playerMustPay(player, 100);
         },
     },
     {
         name: "Pay school fees of $50",
         handler: (player: Player) => {
-            player.cash -= 50;
+            playerMustPay(player, 50);
         },
     },
     {
@@ -964,7 +1211,7 @@ export const communityChestCards = [
                 }
                 return total;
             }, 0);
-            player.cash -= toPay;
+            playerMustPay(player, toPay);
         },
     },
     {
