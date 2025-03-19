@@ -1,7 +1,21 @@
+interface Game {
+    players: Player[];
+    cells: Cell[];
+    communityChestCards: Card[];
+    communityChestDiscardPile: Card[];
+    chanceCards: Card[];
+    chanceDiscardPile: Card[];
+}
+
+interface Card {
+    name: string;
+    handler: (player: Player, game: Game) => void
+}
+
 interface Player {
     id: number;
     piece: string;
-    position: number; // default 0
+    position: CellPosition; // default CellPositions.Go
     cash: number; // default 1500
     jailTurns: number; // default 0
 }
@@ -101,19 +115,30 @@ export const CellPositions: Record<string, CellPosition> = Object.freeze({
     ParkPlace: 37,
     LuxuryTax: 38,
     Boardwalk: 39,
-})
+});
+
+export const CellTypes: Record<string, string> = Object.freeze({
+    Chance: "chance",
+    CommunityChest: "communityChest",
+    FreeParking: "freeParking",
+    Go: "go",
+    GoToJail: "goToJail",
+    Jail: "jail",
+    Property: "property",
+    Tax: "tax",
+});
 
 export const cells: Cell[] =[
     {
         id: CellPositions.Go,
         name: "Go",
-        type: "go",
+        type: CellTypes.Go,
         value: 200,
     },
     {
         id: CellPositions.MediterraneanAvenue,
         name: "Mediterranean Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-purple-700",
         group: "purple",
         owner: null,
@@ -135,12 +160,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.CommunityChest1,
         name: "Community Chest",
-        type: "communityChest",
+        type: CellTypes.CommunityChest,
     },
     {
         id: CellPositions.BalticAvenue,
         name: "Baltic Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-purple-700",
         group: "purple",
         owner: null,
@@ -162,13 +187,13 @@ export const cells: Cell[] =[
     {
         id: CellPositions.IncomeTax,
         name: "Income Tax",
-        type: "tax",
+        type: CellTypes.Tax,
         value: 200,
     },
     {
         id: CellPositions.ReadingRailroad,
         name: "Reading Railroad",
-        type: "property",
+        type: CellTypes.Property,
         group: "railroads",
         color: "bg-black",
         owner: null,
@@ -183,7 +208,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.OrientalAvenue,
         name: "Oriental Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-blue-300",
         group: "light-blue",
         owner: null,
@@ -205,12 +230,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.Chance1,
         name: "Chance",
-        type: "chance",
+        type: CellTypes.Chance,
     },
     {
         id: CellPositions.VermontAvenue,
         name: "Vermont Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-blue-300",
         group: "light-blue",
         owner: null,
@@ -232,7 +257,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.ConnecticutAvenue,
         name: "Connecticut Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-blue-300",
         group: "light-blue",
         owner: null,
@@ -254,12 +279,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.Jail,
         name: "Jail",
-        type: "jail",
+        type: CellTypes.Jail,
     },
     {
         id: CellPositions.StCharlesPlace,
         name: "St. Charles Place",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-pink-500",
         group: "magenta",
         owner: null,
@@ -281,7 +306,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.ElectricCompany,
         name: "Electric Company",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-white",
         group: "utilities",
         owner: null,
@@ -297,7 +322,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.StatesAvenue,
         name: "States Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-pink-500",
         group: "magenta",
         owner: null,
@@ -319,7 +344,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.VirginiaAvenue,
         name: "Virginia Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-pink-500",
         group: "magenta",
         owner: null,
@@ -341,7 +366,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.PennsylvaniaRailroad,
         name: "Pennsylvania Railroad",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-black",
         group: "railroads",
         owner: null,
@@ -356,7 +381,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.StJamesPlace,
         name: "St. James Place",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-orange-500",
         group: "orange",
         owner: null,
@@ -378,12 +403,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.CommunityChest2,
         name: "Community Chest",
-        type: "communityChest",
+        type: CellTypes.CommunityChest,
     },
     {
         id: CellPositions.TennesseeAvenue,
         name: "Tennessee Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-orange-500",
         group: "orange",
         owner: null,
@@ -405,7 +430,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.NewYorkAvenue,
         name: "New York Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-orange-500",
         group: "orange",
         owner: null,
@@ -427,12 +452,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.FreeParking,
         name: "Free Parking",
-        type: "freeParking",
+        type: CellTypes.FreeParking,
     },
     {
         id: CellPositions.KentuckyAvenue,
         name: "Kentucky Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-red-600",
         group: "red",
         owner: null,
@@ -454,12 +479,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.Chance,
         name: "Chance",
-        type: "chance",
+        type: CellTypes.Chance,
     },
     {
         id: CellPositions.IndianaAvenue,
         name: "Indiana Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-red-600",
         group: "red",
         owner: null,
@@ -481,7 +506,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.IllinoisAvenue,
         name: "Illinois Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-red-600",
         group: "red",
         owner: null,
@@ -503,7 +528,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.BORailroad,
         name: "B. & O. Railroad",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-black",
         group: "railroads",
         owner: null,
@@ -518,7 +543,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.AtlanticAvenue,
         name: "Atlantic Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-yellow-400",
         group: "yellow",
         owner: null,
@@ -540,7 +565,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.VentnorAvenue,
         name: "Ventnor Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-yellow-400",
         group: "yellow",
         owner: null,
@@ -562,7 +587,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.WaterWorks,
         name: "Water Works",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-white",
         group: "utilities",
         owner: null,
@@ -578,7 +603,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.MarvinGardens,
         name: "Marvin Gardens",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-yellow-400",
         group: "yellow",
         owner: null,
@@ -600,12 +625,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.GotoJail,
         name: "Go to Jail",
-        type: "goToJail",
+        type: CellTypes.GoToJail,
     },
     {
         id: CellPositions.PacificAvenue,
         name: "Pacific Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-green-600",
         group: "green",
         owner: null,
@@ -627,7 +652,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.NorthCarolinaAvenue,
         name: "North Carolina Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-green-600",
         group: "green",
         owner: null,
@@ -649,12 +674,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.CommunityChest3,
         name: "Community Chest",
-        type: "communityChest",
+        type: CellTypes.CommunityChest,
     },
     {
         id: CellPositions.PennsylvaniaAvenue,
         name: "Pennsylvania Avenue",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-green-600",
         group: "green",
         owner: null,
@@ -676,7 +701,7 @@ export const cells: Cell[] =[
     {
         id: CellPositions.ShortLine,
         name: "Short Line",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-black",
         group: "railroads",
         owner: null,
@@ -691,12 +716,12 @@ export const cells: Cell[] =[
     {
         id: CellPositions.Chance3,
         name: "Chance",
-        type: "chance",
+        type: CellTypes.Chance,
     },
     {
         id: CellPositions.ParkPlace,
         name: "Park Place",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-blue-800",
         group: "blue",
         owner: null,
@@ -718,13 +743,13 @@ export const cells: Cell[] =[
     {
         id: CellPositions.LuxuryTax,
         name: "Luxury Tax",
-        type: "tax",
+        type: CellTypes.Tax,
         value: 100,
     },
     {
         id: CellPositions.Boardwalk,
         name: "Boardwalk",
-        type: "property",
+        type: CellTypes.Property,
         color: "bg-blue-800",
         group: "blue",
         owner: null,
@@ -745,6 +770,15 @@ export const cells: Cell[] =[
     },
 ];
 
+export function newPlayer(id: number): Player {
+    return {
+        id,
+        piece: "dog",
+        position: CellPositions.Go,
+        cash: 1500,
+        jailTurns: 0,
+    };
+}
 
 export function movePlayer(player: Player, cellPosition: CellPosition) {
     if (player.position === CellPositions.Jail && player.jailTurns > 0) {
@@ -772,6 +806,107 @@ export function handleAdvanceToRailroad(player: Player) {
     }
 }
 
+export function takeTurn(player: Player, game: Game) {
+    const doublesLimit = 3;
+    for (let doubles = 1; doubles < doublesLimit; doubles++) {
+        const roll = rollDice();
+        const newPosition: CellPosition = player.position + roll.total;
+        movePlayer(player, newPosition);
+        handlePlayerLandsInCell(player, newPosition, game);
+        if (player.position === CellPositions.Jail && player.jailTurns > 0 && roll.isDouble) {
+            // In jail. Just rolled a double. We get to leave!
+            player.jailTurns = 0;
+            return;
+        }
+        if (!roll.isDouble) {
+            return;
+        }
+    }
+    // Rolled doubles three times in a row. Straight to jail!
+    playerGoesToJail(player);
+}
+
+export function handlePlayerLandsInCell(player: Player, cellPosition: CellPosition, game: Game) {
+    const cell = cells[cellPosition];
+    switch (cell.type) {
+        case CellTypes.Chance:
+            drawAndPlayChance(player, game);
+            return;
+        case CellTypes.CommunityChest:
+            drawAndPlayCommunityChest(player, game);
+            return;
+        case CellTypes.FreeParking:
+            // TODO: Lottery house rule would apply here
+            return;
+        case CellTypes.Go:
+            // TODO: $400 house rule would apply here
+            return;
+        case CellTypes.GoToJail:
+            playerGoesToJail(player);
+            return;
+        case CellTypes.Jail:
+            // just visiting
+            return;
+        case CellTypes.Property:
+            handlePlayerLandsInProperty(player, cell, game);
+            return;
+        case CellTypes.Tax:
+            playerMustPay(player, cell.value!);
+            return;
+        default:
+            console.error("What did you just land on???", cellPosition, cell);
+    }
+}
+
+export function handlePlayerLandsInProperty(player: Player, cell: Cell, game: Game) {
+    // Player owns it. Do nothing.
+    if (player.id === cell.owner) {
+        return;
+    }
+
+    // Another player owns it. Pay up.
+    if (cell.owner !== null && cell.owner !== undefined) {
+        const rent = getPropertyRent(cell.id);
+        playerMustPay(player, rent);
+    }
+
+    // No one owns it. Player gets to buy or auction it.
+    if (cell.value && player.cash >= cell.value) {
+        buyProperty(player, cell.id, cell.value);
+    } else {
+        auctionProperty(cell.id, game, 1);
+    }
+}
+
+export function playerGoesToJail(player: Player) {
+    player.position = CellPositions.Jail;
+    player.jailTurns += 3;
+}
+
+export function drawAndPlayCommunityChest(player: Player, game: Game) {
+    const index = Math.floor(Math.random() * game.communityChestCards.length);
+    const card = game.communityChestCards[index];
+    card.handler(player, game);
+    game.communityChestCards.splice(index, 1);
+    game.communityChestDiscardPile.push(card);
+    if (game.communityChestCards.length === 0) {
+        game.communityChestCards = game.communityChestDiscardPile;
+        game.communityChestDiscardPile = [];
+    }
+}
+
+export function drawAndPlayChance(player: Player, game: Game) {
+    const index = Math.floor(Math.random() * game.chanceCards.length);
+    const card = game.chanceCards[index];
+    card.handler(player, game);
+    game.chanceCards.splice(index, 1);
+    game.chanceDiscardPile.push(card);
+    if (game.chanceCards.length === 0) {
+        game.chanceCards = game.chanceDiscardPile;
+        game.chanceDiscardPile = [];
+    }
+}
+
 export function rollDice(): Roll {
     const first = Math.ceil(Math.random() * 6);
     const second = Math.ceil(Math.random() * 6);
@@ -794,8 +929,34 @@ export function handleDoubles(player: Player, roll: Roll, count = 1) {
     }
     if (count === 3) {
         // 3 consecutive doubles: Go to jail.
-        player.position = CellPositions.Jail;
-        player.jailTurns += 3;
+        playerGoesToJail(player);
+    }
+}
+
+export function auctionProperty(cellPosition: CellPosition, game: Game, startingPrice: number = 1) {
+    const cell = cells[cellPosition];
+    if (!cell.forSale) {
+        console.error("Not for sale");
+    }
+    const shouldBid = (player: Player, cell: Cell, currentBid: number): boolean => {
+      let fairValue = cell.value!;
+      return player.cash >= currentBid && currentBid <= fairValue;
+    };
+    let stillBidding = true;
+    let highestBid = startingPrice;
+    let currentWinner: Player|undefined = undefined;
+    while (stillBidding) {
+        stillBidding = false;
+        for (const p of game.players) {
+            if (currentWinner !== p && shouldBid(p, cell, highestBid + 1)) {
+                highestBid += 1;
+                stillBidding = true;
+                currentWinner = p;
+            }
+        }
+    }
+    if (currentWinner) {
+        buyProperty(currentWinner, cellPosition, highestBid);
     }
 }
 
@@ -999,7 +1160,7 @@ export function liquidate(player: Player, limit = Infinity) {
     }
 }
 
-export const chanceCards = [
+export const chanceCards: Card[] = [
     {
         name: "Advance to Boardwalk",
         handler: (player: Player) => {
@@ -1065,8 +1226,7 @@ export const chanceCards = [
     {
         name: "Go to Jail. Go directly to Jail, do not pass Go, do not collect $200",
         handler: (player: Player) => {
-            player.position = CellPositions.Jail;
-            player.jailTurns += 3;
+            playerGoesToJail(player)
         }
     },
     {
@@ -1099,9 +1259,9 @@ export const chanceCards = [
     },
     {
         name: "You have been elected Chairman of the Board. Pay each player $50",
-        handler: (player: Player, players: Player[]) => {
-            playerMustPay(player, 50 * (players.length - 1));
-            for (const op of players) {
+        handler: (player: Player, game: Game) => {
+            playerMustPay(player, 50 * (game.players.length - 1));
+            for (const op of game.players) {
                 if (op.id === player.id) continue;
                 op.cash += 50;
             }
@@ -1115,13 +1275,13 @@ export const chanceCards = [
     },
 ];
 
-export const communityChestCards = [
+export const communityChestCards: Card[] = [
     {
         name: "Advance to Go (Collect $200)",
         handler: (player: Player) => {
             movePlayer(player, CellPositions.Go);
         },
-},
+    },
     {
         name: "Bank error in your favor. Collect $200",
         handler: (player: Player) => {
@@ -1149,8 +1309,7 @@ export const communityChestCards = [
     {
         name: "Go to Jail. Go directly to jail, do not pass Go, do not collect $200",
         handler: (player: Player) => {
-            player.position = CellPositions.Jail;
-            player.jailTurns += 3;
+            playerGoesToJail(player);
         },
     },
     {
@@ -1167,8 +1326,8 @@ export const communityChestCards = [
     },
     {
         name: "It is your birthday. Collect $10 from every player",
-        handler: (player: Player, players: Player[]) => {
-            for (const op of players) {
+        handler: (player: Player, game: Game) => {
+            for (const op of game.players) {
                 playerMustPay(op, 10);
                 player.cash += 10;
             }

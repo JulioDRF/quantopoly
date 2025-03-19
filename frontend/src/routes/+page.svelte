@@ -1,17 +1,17 @@
 <script lang="ts">
-import { cells } from "../constants.js";
+import { cells, communityChestCards, chanceCards } from "../constants.js";
 
     let game = {
-        board: {
-            cells,
-        },
+        cells,
         players: [],
+        communityChestCards,
+        chanceCards,
     };
 </script>
 
 <div class="board">
     <div class="cell ga-center">GUH</div>
-    {#each game.board.cells as cell, index}
+    {#each game.cells as cell, index}
         <div class="cell ga-c{index}">
             {#if cell.color }
                 <div class="cell-color {cell.color}"></div>
