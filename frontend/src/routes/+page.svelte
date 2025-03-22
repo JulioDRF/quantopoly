@@ -1,11 +1,22 @@
 <script lang="ts">
-import { game } from "../constants.js";
-
+    import {game, nextTurn, GameStates, getPlayersInCell} from "../constants.js";
+    function handleNextTurn() {
+        for (let i = 0; i < 1000; i++) {
+            nextTurn(game);
+            if (game.state === GameStates.Ended) {
+                break;
+            }
+        }
+        game.cells = game.cells;
+    }
 
 </script>
 
 <div class="board">
-    <div class="cell ga-center">GUH</div>
+    <div class="cell ga-center">
+        <h1>Quantopoly</h1>
+        <button class="cursor-pointer" on:click="{handleNextTurn}" disabled="{game.state === GameStates.Ended}">Next turn</button>
+    </div>
     {#each game.cells as cell, index}
         <div class="cell ga-c{index}">
             {#if cell.color }
@@ -23,6 +34,11 @@ import { game } from "../constants.js";
                 </div>
                 <span>Collect $200</span>
             {/if}
+            <div class="player-space flex justify-evenly items-center">
+                {#each getPlayersInCell(cell.id, game) as player}
+                    <div class="font-bold border-solid border-2 rounded-2xl border-red-500 p-1">{player.token}</div>
+                {/each}
+            </div>
         </div>
     {/each}
 </div>

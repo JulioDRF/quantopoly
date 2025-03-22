@@ -5,7 +5,15 @@ interface Game {
     communityChestDiscardPile: Card[];
     chanceCards: Card[];
     chanceDiscardPile: Card[];
+    turn: number;
+    state: GameState;
 }
+
+export enum GameStates {
+    Ongoing= "ongoing",
+    Ended= "ended",
+}
+type GameState = `${GameStates}`;
 
 interface Card {
     name: string;
@@ -84,9 +92,16 @@ export function movePlayer(player: Player, cellPosition: CellPosition, game: Gam
     }
     if (player.position > cellPosition) {
         player.cash += 200;
+        console.log(`${player.token} passes Go and collects 200`);
+
     }
     player.position = cellPosition;
+    console.log(`${player.token} moves to ${game.cells[cellPosition].name}`);
     handlePlayerLandsInCell(player, cellPosition, game);
+}
+
+export function getPlayersInCell(cellPosition: CellPosition, game: Game) {
+    return game.players.filter((p) => p.position === cellPosition);
 }
 
 export function handleAdvanceToNearestRailroad(player: Player, game: Game) {
@@ -104,27 +119,79 @@ export function handleAdvanceToNearestRailroad(player: Player, game: Game) {
     }
 }
 
+export function isInJail(player: Player): boolean {
+    return player.position === CellPositions.Jail && player.jailTurns > 0;
+}
+
+export function getGroups(cells: Cell[]): Record<string, Cell[]> {
+    return cells.reduce((obj, cell) => {
+        if (!cell.forSale || !cell.group) return obj;
+        if (!(cell.group in obj)) {
+            obj[cell.group] = [];
+        }
+        obj[cell.group].push(cell);
+        return obj;
+    }, {} as Record<string, Cell[]>);
+}
+
 export function takeTurn(player: Player, game: Game) {
+    if (isInJail(player) && player.cash >= 50) {
+        // Player pays to get out of Jail
+        console.log(`${player.token} pays $50 to get out of Jail`);
+        playerMustPay(player, 50);
+        player.jailTurns = 0;
+    }
+    const groups = getGroups(game.cells);
+    const ownedGroups = getGroups(game.cells.filter((cell) => cell.owner === player.id));
+    for (const [group, cells] of Object.entries(ownedGroups)) {
+        if (group === "utilities" || group === "railroads") continue;
+        if (cells.length === groups[group].length) {
+            // Player owns a set
+            let budget = Math.floor(player.cash * 0.66);
+            const houseCost = cells[0].houseCost!;
+            const houseCount = Math.floor(budget / houseCost);
+            if (houseCount > 0) {
+                for (let i = 0; i < houseCount; i++) {
+                    const cell = cells[i % cells.length];
+                    if (cell.houseCount! < 4) {
+                        console.log(`${player.token} buys a house for ${cell.name}`);
+                        playerMustPay(player, houseCost);
+                        cell.houseCount!++;
+                    }
+                }
+            }
+        }
+    }
     const doublesLimit = 3;
-    for (let doubles = 1; doubles < doublesLimit; doubles++) {
+    for (let doubles = 1; doubles <= doublesLimit; doubles++) {
         const roll = rollDice();
-        if (player.position === CellPositions.Jail && player.jailTurns > 0 && roll.isDouble) {
+        console.log(`${player.token} rolled: ${roll.first}, ${roll.second}`);
+        if (roll.isDouble && doubles === doublesLimit) {
+            break;
+        }
+        if (isInJail(player) && roll.isDouble) {
             // In jail. Just rolled a double. We get to leave!
+            console.log(`${player.token} rolled a double, so they're out of jail`);
             player.jailTurns = 0;
             return;
         }
-        const newPosition: CellPosition = player.position + roll.total;
+        const newPosition: CellPosition = (player.position + roll.total) % game.cells.length;
         movePlayer(player, newPosition, game);
-        if (!roll.isDouble) {
+
+        if (isInJail(player) || !roll.isDouble) {
             return;
         }
     }
-    // Rolled doubles three times in a row. Straight to jail!
+    console.log(`${player.token} rolled doubles thrice in a row. Go to jail!`);
     playerGoesToJail(player);
 }
 
 export function handlePlayerLandsInCell(player: Player, cellPosition: CellPosition, game: Game) {
-    const cell = cells[cellPosition];
+    const cell = game.cells[cellPosition];
+    if (!cell) {
+        console.error("WTF");
+        debugger;
+    }
     switch (cell.type) {
         case CellTypes.Chance:
             drawAndPlayChance(player, game);
@@ -164,7 +231,12 @@ export function handlePlayerLandsInProperty(player: Player, cell: Cell, game: Ga
     // Another player owns it. Pay up.
     if (cell.owner !== null && cell.owner !== undefined) {
         const rent = getPropertyRent(cell.id);
-        playerMustPay(player, rent);
+        const paid = playerMustPay(player, rent);
+        const owner = game.players.find((p) => p.id === cell.owner);
+        if (owner) {
+            owner.cash += paid;
+        }
+        return;
     }
 
     // No one owns it. Player gets to buy or auction it.
@@ -178,11 +250,13 @@ export function handlePlayerLandsInProperty(player: Player, cell: Cell, game: Ga
 export function playerGoesToJail(player: Player) {
     player.position = CellPositions.Jail;
     player.jailTurns += 3;
+    console.log(`${player.token} goes to Jail :(`);
 }
 
 export function drawAndPlayCommunityChest(player: Player, game: Game) {
     const index = Math.floor(Math.random() * game.communityChestCards.length);
     const card = game.communityChestCards[index];
+    console.log(player.token, "draws Community Chest:", card.name);
     card.handler(player, game);
     game.communityChestCards.splice(index, 1);
     game.communityChestDiscardPile.push(card);
@@ -195,6 +269,7 @@ export function drawAndPlayCommunityChest(player: Player, game: Game) {
 export function drawAndPlayChance(player: Player, game: Game) {
     const index = Math.floor(Math.random() * game.chanceCards.length);
     const card = game.chanceCards[index];
+    console.log(player.token, "draws Chance:", card.name);
     card.handler(player, game);
     game.chanceCards.splice(index, 1);
     game.chanceDiscardPile.push(card);
@@ -215,26 +290,13 @@ export function rollDice(): Roll {
     };
 }
 
-export function handleDoubles(player: Player, roll: Roll, count = 1, game: Game) {
-    if (!roll.isDouble) {
-        return;
-    }
-    if (player.position === CellPositions.Jail && player.jailTurns > 0) {
-        // Get out of jail
-        player.jailTurns = 0;
-        movePlayer(player, player.position + roll.total, game);
-    }
-    if (count === 3) {
-        // 3 consecutive doubles: Go to jail.
-        playerGoesToJail(player);
-    }
-}
-
 export function auctionProperty(cellPosition: CellPosition, game: Game, startingPrice: number = 1) {
+
     const cell = cells[cellPosition];
     if (!cell.forSale) {
         console.error("Not for sale");
     }
+    console.log(`${cell.name} is being auctioned. Starting price: ${startingPrice}`);
     const shouldBid = (player: Player, cell: Cell, currentBid: number): boolean => {
       const ownedInSameGroup = game.cells.filter((c) => c.owner === player.id && c.group === cell.group);
       let fairValue = cell.value! * (ownedInSameGroup.length + 1);
@@ -265,14 +327,20 @@ export function buyProperty(player: Player, cellPosition: CellPosition, price: n
     }
     playerMustPay(player, price);
     cell.owner = player.id;
+    console.log(`${player.token} buys ${cell.name}`);
 }
 
-export function playerMustPay(player: Player, amount: number) {
+export function playerMustPay(player: Player, amount: number): number {
     if (player.cash >= amount) {
         player.cash -= amount;
-        return;
+        console.log(`${player.token} pays: ${amount}. Remaining cash: ${player.cash}`);
+        return amount;
     } else {
-        liquidate(player, amount);
+        console.log(`${player.token} can't afford to pay: ${amount}. Liquidation time!`);
+        const paid = liquidate(player, amount);
+        player.cash -= paid;
+        console.log(`${player.token} pays: ${amount}. Remaining cash: ${player.cash}`);
+        return paid;
     }
 }
 
@@ -434,7 +502,7 @@ export function sellGroupHouses(player: Player, cellPosition: CellPosition) {
     }
 }
 
-export function liquidate(player: Player, limit = Infinity) {
+export function liquidate(player: Player, limit = Infinity): number {
     const properties = cells.filter((c) => c.owner === player.id).sort((a, b) => getPropertyRent(a.id) - getPropertyRent(b.id));
     while (player.cash < limit && properties.length > 0) {
         const cell = properties.pop();
@@ -456,6 +524,26 @@ export function liquidate(player: Player, limit = Infinity) {
         }
         sellProperty(player, cell.id, getPropertySellPrice(cell.id));
     }
+    if (player.cash < limit) {
+        return player.cash;
+    }
+    return limit;
+}
+
+export function nextTurn(game: Game) {
+    const player = game.players[game.turn % game.players.length];
+    if (isBankrupt(player)) {
+        console.debug("Player", player.id, "is bankrupt. RIP BOZO");
+        game.players = game.players.filter((p) => p.id !== player.id);
+        if (game.players.length <= 1) {
+            console.log("GAME OVER. Winner:", game.players[0]);
+            game.state = GameStates.Ended;
+            return;
+        }
+    } else {
+        takeTurn(player, game);
+    }
+    game.turn++;
 }
 
 const railroadRents: RailRoadRents = {
@@ -1342,6 +1430,9 @@ export const communityChestCards: Card[] = [
         name: "It is your birthday. Collect $10 from every player",
         handler: (player: Player, game: Game) => {
             for (const op of game.players) {
+                if (op.id === player.id) {
+                    continue;
+                }
                 playerMustPay(op, 10);
                 player.cash += 10;
             }
@@ -1406,4 +1497,8 @@ export const game = {
     players: tokens.map((t, i) => newPlayer(i, t)),
     communityChestCards,
     chanceCards,
+    communityChestDiscardPile: [],
+    chanceDiscardPile: [],
+    turn: 0,
+    state: GameStates.Ongoing,
 };
