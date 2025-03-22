@@ -138,7 +138,7 @@ export function takeTurn(player: Player, game: Game) {
     if (isInJail(player) && player.cash >= 50) {
         // Player pays to get out of Jail
         console.log(`${player.token} pays $50 to get out of Jail`);
-        playerMustPay(player, 50);
+        playerMustPay(player, 50, game);
         player.jailTurns = 0;
     }
     const groups = getGroups(game.cells);
@@ -150,13 +150,19 @@ export function takeTurn(player: Player, game: Game) {
             let budget = Math.floor(player.cash * 0.66);
             const houseCost = cells[0].houseCost!;
             const houseCount = Math.floor(budget / houseCost);
+            const canBuildHotels = cells.reduce((acc, c) => c.houseCount === 4 && acc, true);
             if (houseCount > 0) {
                 for (let i = 0; i < houseCount; i++) {
                     const cell = cells[i % cells.length];
                     if (cell.houseCount! < 4) {
                         console.log(`${player.token} buys a house for ${cell.name}`);
-                        playerMustPay(player, houseCost);
+                        playerMustPay(player, houseCost, game);
                         cell.houseCount!++;
+                    } else if (canBuildHotels) {
+                        console.log(`${player.token} buys a hotel for ${cell.name}`);
+                        playerMustPay(player, houseCost, game);
+                        cell.houseCount = 0;
+                        cell.hotelCount = 1;
                     }
                 }
             }
@@ -215,7 +221,7 @@ export function handlePlayerLandsInCell(player: Player, cellPosition: CellPositi
             handlePlayerLandsInProperty(player, cell, game);
             return;
         case CellTypes.Tax:
-            playerMustPay(player, cell.value!);
+            playerMustPay(player, cell.value!, game);
             return;
         default:
             console.error("What did you just land on???", cellPosition, cell);
@@ -231,7 +237,7 @@ export function handlePlayerLandsInProperty(player: Player, cell: Cell, game: Ga
     // Another player owns it. Pay up.
     if (cell.owner !== null && cell.owner !== undefined) {
         const rent = getPropertyRent(cell.id);
-        const paid = playerMustPay(player, rent);
+        const paid = playerMustPay(player, rent, game);
         const owner = game.players.find((p) => p.id === cell.owner);
         if (owner) {
             owner.cash += paid;
@@ -241,9 +247,9 @@ export function handlePlayerLandsInProperty(player: Player, cell: Cell, game: Ga
 
     // No one owns it. Player gets to buy or auction it.
     if (cell.value && player.cash >= cell.value) {
-        buyProperty(player, cell.id, cell.value);
+        buyProperty(player, cell.id, cell.value, game);
     } else {
-        auctionProperty(cell.id, game, 1);
+        auctionProperty(cell.id, 1, game);
     }
 }
 
@@ -290,7 +296,7 @@ export function rollDice(): Roll {
     };
 }
 
-export function auctionProperty(cellPosition: CellPosition, game: Game, startingPrice: number = 1) {
+export function auctionProperty(cellPosition: CellPosition, startingPrice: number = 1, game: Game) {
 
     const cell = cells[cellPosition];
     if (!cell.forSale) {
@@ -316,28 +322,28 @@ export function auctionProperty(cellPosition: CellPosition, game: Game, starting
         }
     }
     if (currentWinner) {
-        buyProperty(currentWinner, cellPosition, highestBid);
+        buyProperty(currentWinner, cellPosition, highestBid, game);
     }
 }
 
-export function buyProperty(player: Player, cellPosition: CellPosition, price: number) {
-    const cell = cells[cellPosition];
+export function buyProperty(player: Player, cellPosition: CellPosition, price: number, game: Game) {
+    const cell = game.cells[cellPosition];
     if (!cell.forSale) {
         console.error("Not for sale");
     }
-    playerMustPay(player, price);
+    playerMustPay(player, price, game);
     cell.owner = player.id;
     console.log(`${player.token} buys ${cell.name}`);
 }
 
-export function playerMustPay(player: Player, amount: number): number {
+export function playerMustPay(player: Player, amount: number, game: Game): number {
     if (player.cash >= amount) {
         player.cash -= amount;
         console.log(`${player.token} pays: ${amount}. Remaining cash: ${player.cash}`);
         return amount;
     } else {
         console.log(`${player.token} can't afford to pay: ${amount}. Liquidation time!`);
-        const paid = liquidate(player, amount);
+        const paid = liquidate(player, amount, game);
         player.cash -= paid;
         console.log(`${player.token} pays: ${amount}. Remaining cash: ${player.cash}`);
         return paid;
@@ -481,10 +487,11 @@ export function mortgageProperty(player: Player, cellPosition: CellPosition) {
     player.cash += cell.value! / 2;
 }
 
-export function sellHouses(player: Player, cellPosition: CellPosition) {
-    const cell = cells[cellPosition];
+export function sellHouses(player: Player, cellPosition: CellPosition, game: Game) {
+    const cell = game.cells[cellPosition];
     if (!cell.forSale || cell.owner !== player.id) {
         console.error("Can't sell this property's houses");
+        debugger;
         return;
     }
     if (cell.houseCount && cell.houseCount > 0) {
@@ -495,14 +502,14 @@ export function sellHouses(player: Player, cellPosition: CellPosition) {
     }
 }
 
-export function sellGroupHouses(player: Player, cellPosition: CellPosition) {
-    const group = cells.filter((c) => c.group === cells[cellPosition].group);
+export function sellGroupHouses(player: Player, cellPosition: CellPosition, game: Game) {
+    const group = game.cells.filter((c) => c.group === cells[cellPosition].group);
     for (const cell of group) {
-        sellHouses(player, cell.id);
+        sellHouses(player, cell.id, game);
     }
 }
 
-export function liquidate(player: Player, limit = Infinity): number {
+export function liquidate(player: Player, limit = Infinity, game: Game): number {
     const properties = cells.filter((c) => c.owner === player.id).sort((a, b) => getPropertyRent(a.id) - getPropertyRent(b.id));
     while (player.cash < limit && properties.length > 0) {
         const cell = properties.pop();
@@ -511,11 +518,11 @@ export function liquidate(player: Player, limit = Infinity): number {
             break;
         }
         if (cell.houseCount && cell.houseCount > 0) {
-            sellHouses(player, cell.id);
+            sellHouses(player, cell.id, game);
             if (player.cash >= limit) break;
         }
         if (!canMortgageProperty(player, cell.id)) {
-            sellGroupHouses(player, cell.id);
+            sellGroupHouses(player, cell.id, game);
             if (player.cash >= limit) break;
         }
         if (canMortgageProperty(player, cell.id)) {
@@ -1252,14 +1259,14 @@ const cells: Cell[] =[
 export const tokens = Object.freeze([
     "Battleship",
     "Boot",
-    "Cannon",
-    "Thimble",
-    "Top Hat",
-    "Iron",
-    "Race Car",
-    "Purse",
-    "Lantern",
-    "Rocking Horse",
+    // "Cannon",
+    // "Thimble",
+    // "Top Hat",
+    // "Iron",
+    // "Race Car",
+    // "Purse",
+    // "Lantern",
+    // "Rocking Horse",
 ])
 
 export const chanceCards: Card[] = [
@@ -1321,8 +1328,8 @@ export const chanceCards: Card[] = [
     },
     {
         name: "Go Back 3 Spaces",
-        handler: (player: Player) => {
-            player.position = (player.position - 3) & cells.length;
+        handler: (player: Player, game: Game) => {
+            player.position = (player.position - 3) % game.cells.length;
         }
     },
     {
@@ -1333,7 +1340,7 @@ export const chanceCards: Card[] = [
     },
     {
         name: "Make general repairs on all your property. For each house pay $25. For each hotel pay $100",
-        handler: (player: Player) => {
+        handler: (player: Player, game: Game) => {
             const playerProperties = cells.filter((c) => c.owner === player.id);
             const toPay = playerProperties.reduce((total, cell) => {
                 if (cell.hotelCount && cell.hotelCount > 0) {
@@ -1344,13 +1351,13 @@ export const chanceCards: Card[] = [
                 }
                 return total;
             }, 0);
-            playerMustPay(player, toPay);
+            playerMustPay(player, toPay, game);
         }
     },
     {
         name: "Speeding fine $15",
-        handler: (player: Player) => {
-            playerMustPay(player, 15);
+        handler: (player: Player, game: Game) => {
+            playerMustPay(player, 15, game);
         }
     },
     {
@@ -1362,7 +1369,7 @@ export const chanceCards: Card[] = [
     {
         name: "You have been elected Chairman of the Board. Pay each player $50",
         handler: (player: Player, game: Game) => {
-            playerMustPay(player, 50 * (game.players.length - 1));
+            playerMustPay(player, 50 * (game.players.length - 1), game);
             for (const op of game.players) {
                 if (op.id === player.id) continue;
                 op.cash += 50;
@@ -1392,8 +1399,8 @@ export const communityChestCards: Card[] = [
     },
     {
         name: "Doctor’s fee. Pay $50",
-        handler: (player: Player) => {
-            playerMustPay(player, 50);
+        handler: (player: Player, game: Game) => {
+            playerMustPay(player, 50, game);
         },
     },
     {
@@ -1433,7 +1440,7 @@ export const communityChestCards: Card[] = [
                 if (op.id === player.id) {
                     continue;
                 }
-                playerMustPay(op, 10);
+                playerMustPay(op, 10, game);
                 player.cash += 10;
             }
         },
@@ -1446,14 +1453,14 @@ export const communityChestCards: Card[] = [
     },
     {
         name: "Pay hospital fees of $100",
-        handler: (player: Player) => {
-            playerMustPay(player, 100);
+        handler: (player: Player, game: Game) => {
+            playerMustPay(player, 100, game);
         },
     },
     {
         name: "Pay school fees of $50",
-        handler: (player: Player) => {
-            playerMustPay(player, 50);
+        handler: (player: Player, game: Game) => {
+            playerMustPay(player, 50, game);
         },
     },
     {
@@ -1464,7 +1471,7 @@ export const communityChestCards: Card[] = [
     },
     {
         name: "You are assessed for street repair. $40 per house. $115 per hotel",
-        handler: (player: Player) => {
+        handler: (player: Player, game: Game) => {
             const playerProperties = cells.filter((c) => c.owner === player.id);
             const toPay = playerProperties.reduce((total, cell) => {
                 if (cell.hotelCount && cell.hotelCount > 0) {
@@ -1475,7 +1482,7 @@ export const communityChestCards: Card[] = [
                 }
                 return total;
             }, 0);
-            playerMustPay(player, toPay);
+            playerMustPay(player, toPay, game);
         },
     },
     {
