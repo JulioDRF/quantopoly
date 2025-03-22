@@ -1,12 +1,7 @@
 <script lang="ts">
-import { cells, communityChestCards, chanceCards } from "../constants.js";
+import { game } from "../constants.js";
 
-    let game = {
-        cells,
-        players: [],
-        communityChestCards,
-        chanceCards,
-    };
+
 </script>
 
 <div class="board">
